@@ -2,6 +2,8 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
 import mimetypes
 import pathlib
+import json
+from datetime import datetime
 
 class HttpHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -15,6 +17,27 @@ class HttpHandler(BaseHTTPRequestHandler):
         self.send_static()
       else:
         self.send_html_file('error.html', 404)
+
+  def do_POST(self):
+    data = self.rfile.read(int(self.headers['Content-Length']))
+    data_parse = urllib.parse.unquote_plus(data.decode())
+    data_dict = {key: value for key, value in [el.split('=') for el in data_parse.split('&')]}
+
+    timestamp = datetime.now().isoformat()
+    entry = {timestamp: data_dict}
+    json_file_path = 'storage/data.json'
+
+    with open(json_file_path, 'r', encoding='utf-8') as json_file:
+      data = json.load(json_file)
+
+    data.update(entry)
+
+    with open(json_file_path, 'w', encoding='utf-8') as json_file:
+      json.dump(data, json_file, ensure_ascii=False, indent=4)
+
+    self.send_response(302)
+    self.send_header('Location', '/')
+    self.end_headers()
 
   def send_html_file(self, filename, status=200):
     self.send_response(status)
