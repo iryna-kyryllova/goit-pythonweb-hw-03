@@ -2,9 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Messages</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -25,10 +24,10 @@
                 <a class="nav-link" href="/">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Send message</a>
+                <a class="nav-link" href="/message">Send message</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/read">All messages</a>
+                <a class="nav-link active" aria-current="page" href="#">All messages</a>
               </li>
             </ul>
           </div>
@@ -36,22 +35,16 @@
       </nav>
     </header>
     <div class="container mt-3">
-      <main class="form-signin w-50 m-auto">
-        <form action="/message" method="POST">
-          <h1 class="h3 mb-3 fw-normal">Please send me message</h1>
-
-          <div class="row mb-3">
-            <label for="floatingInput">Your nickname</label>
-            <input type="text" class="form-control" id="floatingInput" name="username" />
-          </div>
-
-          <div class="row mb-3 h-100">
-            <label for="floatingTextarea">Message</label>
-            <textarea class="form-control" id="floatingTextarea" name="message"></textarea>
-          </div>
-
-          <button class="w-100 btn btn-lg btn-primary" type="submit">Send</button>
-        </form>
+      <main class="form-signin">
+        <h1>All Messages</h1>
+        <ul>
+          {% for timestamp, message_data in data.items() %}
+          <li>
+            <strong>{{ timestamp }}</strong>: {{ message_data.username }} - {{ message_data.message
+            }}
+          </li>
+          {% endfor %}
+        </ul>
       </main>
     </div>
   </body>

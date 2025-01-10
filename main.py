@@ -4,6 +4,7 @@ import mimetypes
 import pathlib
 import json
 from datetime import datetime
+from jinja2 import Environment, FileSystemLoader
 
 class HttpHandler(BaseHTTPRequestHandler):
   def do_GET(self):
@@ -12,6 +13,8 @@ class HttpHandler(BaseHTTPRequestHandler):
       self.send_html_file('index.html')
     elif pr_url.path == '/message':
       self.send_html_file('message.html')
+    elif pr_url.path == '/read':
+      self.render_read_page()
     else:
       if pathlib.Path().joinpath(pr_url.path[1:]).exists():
         self.send_static()
@@ -56,6 +59,17 @@ class HttpHandler(BaseHTTPRequestHandler):
     self.end_headers()
     with open(f'.{self.path}', 'rb') as file:
       self.wfile.write(file.read())
+
+  def render_read_page(self):
+    with open('storage/data.json', 'r', encoding='utf-8') as json_file:
+      data = json.load(json_file)
+
+    env = Environment(loader=FileSystemLoader('templates'))
+    template = env.get_template('read.html')
+    self.send_response(200)
+    self.send_header('Content-type', 'text/html')
+    self.end_headers()
+    self.wfile.write(template.render(data=data).encode('utf-8'))
 
 def run(server_class=HTTPServer, handler_class=HttpHandler):
     server_address = ('', 3000)
